@@ -1,23 +1,8 @@
 import java.io.*;
-import java.util.Scanner;
 public class FileManager{
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        FileManager fileManager = new FileManager();
 
-        try{
-
-            fileManager.createFile("test.txt");
-            fileManager.writeFile("test.txt", "Hello, World");
-            System.out.println(fileManager.readFile("test.txt"));
-            fileManager.deleteFile("test.txt");
-
-        }
-        catch(IOException e){
-            e.printStackTrace();
-        }
-        sc.close();
     }
 
     public void createFile(String fileName) throws IOException {
