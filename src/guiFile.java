@@ -221,7 +221,7 @@ public class guiFile extends FileManager {
             yesButton.addActionListener(_-> {
                 String filename = textField.getText();
                 try {
-                    fm.deleteFile(filename);
+                    fm.deleteFile("fileLocations/"+filename+".txt");
 
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);

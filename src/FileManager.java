@@ -1,6 +1,6 @@
 import java.io.*;
 import java.util.Scanner;
-public class FileManager {
+public class FileManager{
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
