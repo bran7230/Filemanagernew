@@ -81,11 +81,10 @@ public class guiFile extends FileManager {
             deleteFileframe();
         });
 
-
         return menuBar;
     }
     public static JFrame createFileframe(){
-        JFrame createframe = new JFrame("Enter name for File");
+        JFrame createframe = new JFrame("Enter name for a File you want to create");
         createframe.setSize(600,400);
         createframe.setLocationRelativeTo(null);
 
