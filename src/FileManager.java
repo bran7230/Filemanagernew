@@ -8,7 +8,7 @@ public class FileManager{
 
         try{
 
-            fileManager.createFile("test.tx");
+            fileManager.createFile("test.txt");
             fileManager.writeFile("test.txt", "Hello, World");
             System.out.println(fileManager.readFile("test.txt"));
             fileManager.deleteFile("test.txt");
