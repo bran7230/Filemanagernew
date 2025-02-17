@@ -11,7 +11,7 @@ public class guiFile extends FileManager {
     public static void main(String[] args) {
         JFrame frame = createFrame();
         JMenuItem save = new JMenuItem("Save");//for later add save to create menubar
-        JMenuBar menubar = createMenuBar(frame);
+        JMenuBar menubar = createMenuBar(frame, save);
         frame.setJMenuBar(menubar);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -25,7 +25,7 @@ public class guiFile extends FileManager {
         return fileFrame;
     }
 
-    private static JMenuBar createMenuBar(JFrame frame){
+    private static JMenuBar createMenuBar(JFrame frame, JMenuItem save){
         JMenuBar menuBar = new JMenuBar();
 
         JMenu fileMenu = new JMenu("File");
@@ -45,18 +45,19 @@ public class guiFile extends FileManager {
         JMenuItem deleteMenuItem = new JMenuItem("Delete");
         deleteMenuItem.setMnemonic('D');
 
+        JMenuItem saveMenuItem = save;
         fileMenu.add(editMenuItem);
         fileMenu.add(openMenuItem);
         fileMenu.add(exitMenuItem);
         fileMenu.add(createMenuItem);
         fileMenu.add(deleteMenuItem);
-        //fileMenu.add(saveMenuItem);
+        fileMenu.add(saveMenuItem);
 
         menuBar.add(fileMenu);
 
         openMenuItem.addActionListener(_->{
             try {
-                openFileFrame(frame, menuBar, editMenuItem, openMenuItem, exitMenuItem, createMenuItem, deleteMenuItem, fileMenu);
+                openFileFrame(frame, menuBar,fileMenu, saveMenuItem);
             }
             catch(IOException e){
                System.out.println(e);
@@ -120,18 +121,16 @@ public class guiFile extends FileManager {
         return createframe;
 
     }
-    public static JFrame openFileFrame(JFrame frame, JMenuBar menuBar, JMenuItem editMenuItem,
-                                       JMenuItem openMenuItem, JMenuItem exitMenuItem, JMenuItem createMenuItem, JMenuItem deleteMenuItem,
-                                       JMenu fileMenu) throws IOException {
+    public static JFrame openFileFrame(JFrame frame, JMenuBar menuBar, JMenu fileMenu, JMenuItem save) throws IOException {
 
         JFrame openFileframe = frame;
-        JMenuItem saveMenuItem = new JMenuItem("Save");
         openFileframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        fileMenu.add(saveMenuItem);
         menuBar.add(fileMenu);
         openFileframe.setJMenuBar(menuBar);
+        JMenuItem saveMenuItem = save;
+        openFileframe.getContentPane().removeAll();
 
-        JTextField textField = new JTextField(20);
+        JTextArea textField = new JTextArea();
         textField.setFont(new Font("Monospaced", Font.PLAIN, 12));
         textField.setLayout(new FlowLayout(FlowLayout.CENTER));
         textField.setVisible(true);
@@ -140,13 +139,13 @@ public class guiFile extends FileManager {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setCurrentDirectory(new File("fileLocations"));
-
         if (fileChooser.showOpenDialog(openFileframe) == JFileChooser.APPROVE_OPTION){
 
             File file = fileChooser.getSelectedFile();
             frame.setTitle(file.getName());
             try {
                 textField.setText(fm.readFile(String.valueOf(file)));
+
             }
             catch(IOException e){
                 textField.setText("Error reading file "+e.getMessage());
@@ -163,11 +162,6 @@ public class guiFile extends FileManager {
             }
         });
 
-        fileMenu.add(editMenuItem);
-        fileMenu.add(openMenuItem);
-        fileMenu.add(exitMenuItem);
-        fileMenu.add(createMenuItem);
-        fileMenu.add(deleteMenuItem);
 
         menuBar.add(fileMenu);
 
