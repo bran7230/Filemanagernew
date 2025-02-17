@@ -103,18 +103,20 @@ public class guiFile extends FileManager {
 
         createframe.add(textField);
         createframe.add(submitButton);
+
         submitButton.addActionListener(_->{
             String name = textField.getText();
-            try {
-                fm.createFile(name+".txt");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            File file = new File("fileLocations/"+name+".txt");
             try{
-                Thread.sleep(2000);
+                if(file.createNewFile()){
+                    System.out.println("File created");
+                }
+                else {
+                    System.out.println("File already exists");
+                }
             }
-            catch(InterruptedException e){
-                throw new RuntimeException(e);
+            catch(IOException e){
+                System.out.println(e);
             }
             createframe.dispose();
         });
@@ -145,7 +147,7 @@ public class guiFile extends FileManager {
 
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setCurrentDirectory(new java.io.File("."));
+        fileChooser.setCurrentDirectory(new java.io.File("fileLocations"));
 
         if (fileChooser.showOpenDialog(openFileframe) == JFileChooser.APPROVE_OPTION){
 
@@ -168,8 +170,6 @@ public class guiFile extends FileManager {
                 throw new RuntimeException(e);
             }
         });
-
-
 
         openFileframe.setVisible(true);
         return openFileframe;
@@ -194,6 +194,7 @@ public class guiFile extends FileManager {
 
         JTextField textField = new JTextField(20);
         JButton submitButton = new JButton("Submit");
+        submitButton.setFocusable(false);
 
         submitButton.addActionListener(e -> {
             JFrame choiceframe = new JFrame("Are You Sure?");
@@ -206,6 +207,7 @@ public class guiFile extends FileManager {
 
             JTextField field = new JTextField(50);
             field.setText("Action is permanent and cannot be undone");
+            field.setEditable(false);
 
             choiceframe.setLayout(new FlowLayout());
 
@@ -231,6 +233,7 @@ public class guiFile extends FileManager {
                     throw new RuntimeException(ex);
                 }
                 choiceframe.dispose();
+
             });
             noButton.addActionListener(_->{
 
@@ -241,6 +244,7 @@ public class guiFile extends FileManager {
                     throw new RuntimeException(ex);
                 }
                 choiceframe.dispose();
+
             });
         });
 
