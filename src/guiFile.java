@@ -2,7 +2,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.*;
-import javax.swing.plaf.ColorUIResource;
 
 public class guiFile extends FileManager {
 
@@ -65,7 +64,7 @@ public class guiFile extends FileManager {
 
         openMenuItem.addActionListener(_->{
             try {
-                openFileFrame(frame, menuBar, fileMenu, save);
+                openFileFrame(frame, save);
             } catch(IOException e) {
                 System.out.println(e);
             }
@@ -115,7 +114,7 @@ public class guiFile extends FileManager {
         return createframe;
     }
 
-    public static JFrame openFileFrame(JFrame frame, JMenuBar menuBar, JMenu fileMenu, JMenuItem save) throws IOException {
+    public static JFrame openFileFrame(JFrame frame, JMenuItem save) throws IOException {
         frame.getContentPane().setBackground(BACKGROUND_COLOR);
         frame.getContentPane().removeAll();
 
@@ -227,7 +226,7 @@ public class guiFile extends FileManager {
     private static void styleMenuBar(JMenuBar menuBar) {
         menuBar.setBackground(SECONDARY_BACKGROUND);
         menuBar.setForeground(TEXT_COLOR);
-        menuBar.setBorder(BorderFactory.createEmptyBorder());
+        menuBar.setBorder(BorderFactory.createLineBorder(BACKGROUND_COLOR));
     }
 
     private static void styleMenu(JMenu menu) {
@@ -239,7 +238,7 @@ public class guiFile extends FileManager {
     private static void styleMenuItem(JMenuItem item) {
         item.setBackground(SECONDARY_BACKGROUND);
         item.setForeground(TEXT_COLOR);
-        item.setBorder(BorderFactory.createEmptyBorder());
+        item.setBorder(BorderFactory.createLineBorder(TEXT_COLOR));
     }
 
     private static void styleButton(JButton button) {
@@ -250,7 +249,7 @@ public class guiFile extends FileManager {
     }
 
     private static void styleTextField(JTextField textField) {
-        textField.setBackground(SECONDARY_BACKGROUND);
+        textField.setBackground(BACKGROUND_COLOR);
         textField.setForeground(TEXT_COLOR);
         textField.setCaretColor(TEXT_COLOR);
         textField.setBorder(BorderFactory.createCompoundBorder(
@@ -260,7 +259,7 @@ public class guiFile extends FileManager {
     }
 
     private static void styleTextArea(JTextArea textArea) {
-        textArea.setBackground(SECONDARY_BACKGROUND);
+        textArea.setBackground(BACKGROUND_COLOR);
         textArea.setForeground(TEXT_COLOR);
         textArea.setCaretColor(TEXT_COLOR);
         textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

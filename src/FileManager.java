@@ -1,10 +1,6 @@
 import java.io.*;
 public class FileManager{
 
-    public static void main(String[] args) {
-
-    }
-
     public void createFile(String fileName) throws IOException {
         File file = new File(fileName);
         if (file.createNewFile()) {
