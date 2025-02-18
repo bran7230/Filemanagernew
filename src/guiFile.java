@@ -71,7 +71,9 @@ public class guiFile extends FileManager {
         });
 
         exitMenuItem.addActionListener(_-> System.exit(0));
-        editMenuItem.addActionListener(_-> {});
+        editMenuItem.addActionListener(_-> {
+
+        });
         createMenuItem.addActionListener(_-> createFileframe());
         deleteMenuItem.addActionListener(_-> deleteFileframe());
 
@@ -208,9 +210,11 @@ public class guiFile extends FileManager {
         yesButton.addActionListener(_-> {
             try {
                 fm.deleteFile("fileLocations/"+filename+".txt");
+
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+
             choiceframe.dispose();
         });
 
