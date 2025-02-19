@@ -12,6 +12,9 @@ public class guiFile extends FileManager {
     private static final Color ACCENT_COLOR = new Color(0x4A90E2);
 
     static FileManager fm = new FileManager();
+    private static JTextArea textArea = new JTextArea(); // Persistent text area
+
+
 
     public static void main(String[] args) {
         JFrame frame = createFrame();
@@ -28,10 +31,25 @@ public class guiFile extends FileManager {
         fileFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         fileFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         fileFrame.getContentPane().setBackground(BACKGROUND_COLOR);
+
+        UIManager.put("FileChooser.listViewBackground", SECONDARY_BACKGROUND);
+        UIManager.put("FileChooser.listViewForeground", TEXT_COLOR);
+        UIManager.put("FileChooser.foreground", TEXT_COLOR);
+        UIManager.put("FileChooser.detailsViewBackground", SECONDARY_BACKGROUND);
+        UIManager.put("FileChooser.detailsViewForeground", TEXT_COLOR);
+        UIManager.put("Table.foreground", TEXT_COLOR);
+        UIManager.put("Panel.background", BACKGROUND_COLOR);
+        UIManager.put("Panel.foreground", TEXT_COLOR);
+        UIManager.put("OptionPane.background", BACKGROUND_COLOR);
+        UIManager.put("OptionPane.messageForeground", TEXT_COLOR);
+        UIManager.put("Button.background", BACKGROUND_COLOR);
+        UIManager.put("Button.foreground", TEXT_COLOR);
+
         return fileFrame;
     }
 
     private static JMenuBar createMenuBar(JFrame frame, JMenuItem save) {
+
         JMenuBar menuBar = new JMenuBar();
         styleMenuBar(menuBar);
 
@@ -52,6 +70,7 @@ public class guiFile extends FileManager {
         styleMenuItem(deleteMenuItem);
         styleMenuItem(save);
 
+
         fileMenu.add(editMenuItem);
         fileMenu.add(openMenuItem);
         fileMenu.add(exitMenuItem);
@@ -63,10 +82,13 @@ public class guiFile extends FileManager {
 
 
         openMenuItem.addActionListener(_->{
-            try {
-                openFileFrame(frame, save);
-            } catch(IOException e) {
-                System.out.println(e);
+            int verify = JOptionPane.showConfirmDialog(frame, "Are you sure you want to open file?\n Deletes current on screen text", "Open", JOptionPane.YES_NO_OPTION);
+            if (verify == JOptionPane.YES_OPTION) {
+                try {
+                    openFileFrame(frame, save);
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
             }
         });
 
@@ -117,38 +139,33 @@ public class guiFile extends FileManager {
     }
 
     public static JFrame openFileFrame(JFrame frame, JMenuItem save) throws IOException {
-        frame.getContentPane().setBackground(BACKGROUND_COLOR);
         frame.getContentPane().removeAll();
+        textArea.setText("");
+        styleTextArea(textArea);
 
-        JTextArea textField = new JTextArea();
-        styleTextArea(textField);
-
-        JScrollPane scrollPane = new JScrollPane(textField);
+        JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         frame.add(scrollPane);
 
-        UIManager.put("FileChooser.listViewBackground", SECONDARY_BACKGROUND);
-
-
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.updateUI();
+
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setCurrentDirectory(new File("fileLocations"));
-
-
-
 
         if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             frame.setTitle(file.getName());
             try {
-                textField.setText(fm.readFile(String.valueOf(file)));
+                textArea.setText(fm.readFile(String.valueOf(file)));
+                fileChooser.setSelectedFile(null);
             } catch(IOException e) {
-                textField.setText("Error reading file "+e.getMessage());
+                textArea.setText("Error reading file " + e.getMessage());
             }
         }
 
-        save.addActionListener(_->{
-            String content = textField.getText();
+        save.addActionListener(_ -> {
+            String content = textArea.getText();
             File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
             try {
                 fm.writeFile(String.valueOf(file), content);
@@ -162,6 +179,7 @@ public class guiFile extends FileManager {
         return frame;
     }
 
+
     public static JFrame deleteFileframe(){
         JFrame deleteFileframe = new JFrame("Delete a file");
         deleteFileframe.setSize(800, 600);
@@ -171,7 +189,7 @@ public class guiFile extends FileManager {
         Container container = deleteFileframe.getContentPane();
         container.setLayout(new FlowLayout());
 
-        JLabel label = new JLabel("Enter a file name (Don't include .txt): ");
+        JLabel label = new JLabel("Enter a file name: ");
         label.setForeground(TEXT_COLOR);
 
         JTextField textField = new JTextField(20);
@@ -269,4 +287,6 @@ public class guiFile extends FileManager {
         textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
     }
+
+
 }

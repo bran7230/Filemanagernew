@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.*;
 public class FileManager{
 
@@ -33,7 +34,7 @@ public class FileManager{
             System.out.println("File deleted: " + file.getName());
         }
         else {
-            System.out.println("File could not be deleted.");
+            JOptionPane.showMessageDialog(null, file.getName() + " could not be deleted.");
         }
     }
 
