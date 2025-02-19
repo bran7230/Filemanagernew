@@ -1,7 +1,13 @@
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.*;
+import java.nio.file.*;
+import javax.swing.text.Document;
 
 public class guiFile extends FileManager {
 
@@ -103,40 +109,59 @@ public class guiFile extends FileManager {
     }
 
     public static JFrame createFileframe(){
-        JFrame createframe = new JFrame("Enter name for a File you want to create");
-        createframe.setSize(600,400);
-        createframe.setLocationRelativeTo(null);
 
-        Container container = createframe.getContentPane();
-        container.setLayout(new FlowLayout());
-        container.setBackground(BACKGROUND_COLOR);
+            JFrame createframe = new JFrame("Enter name for a File you want to create");
+            createframe.setSize(600, 400);
+            createframe.setLocationRelativeTo(null);
 
-        JTextField textField = new JTextField(20);
-        styleTextField(textField);
+            Container container = createframe.getContentPane();
+            container.setLayout(new FlowLayout());
+            container.setBackground(BACKGROUND_COLOR);
 
-        JButton submitButton = new JButton("Submit");
-        styleButton(submitButton);
+            JTextField textField = new JTextField(20);
+            styleTextField(textField);
 
-        submitButton.addActionListener(_->{
-            String name = textField.getText();
-            File file = new File("fileLocations/"+name+".txt");
-            try {
-                if(file.createNewFile()){
-                    System.out.println("File created");
-                } else {
-                    System.out.println("File already exists");
+            // Add a JComboBox for file type selection
+            String[] fileTypes = {"PDF", "TXT"};
+            JComboBox<String> fileTypeComboBox = new JComboBox<>(fileTypes);
+
+            JButton submitButton = new JButton("Submit");
+            styleButton(submitButton);
+
+            submitButton.addActionListener(_ -> {
+                String name = textField.getText();
+                String fileType = (String) fileTypeComboBox.getSelectedItem();
+                String filePath = "fileLocations/" + name + "." + fileType.toLowerCase();
+                try {
+                    if (Files.exists(Path.of(filePath))) {
+                        JOptionPane.showMessageDialog(null, "File already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+                        createframe.dispose();
+                    }
+                    else {
+
+                        if ("PDF".equals(fileType)) {
+                            createPDF(filePath);
+                        } else if ("TXT".equals(fileType)) {
+                            File file = new File(filePath);
+                            if (file.createNewFile()) {
+                                System.out.println("File created");
+                            } else {
+                                System.out.println("File already exists");
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch(IOException e) {
-                System.out.println(e);
-            }
-            createframe.dispose();
-        });
+                createframe.dispose();
+            });
 
-        container.add(textField);
-        container.add(submitButton);
-        createframe.setVisible(true);
-        return createframe;
-    }
+            container.add(textField);
+            container.add(fileTypeComboBox);
+            container.add(submitButton);
+            createframe.setVisible(true);
+            return createframe;
+        }
 
     public static JFrame openFileFrame(JFrame frame, JMenuItem save) throws IOException {
         frame.getContentPane().removeAll();
@@ -157,22 +182,45 @@ public class guiFile extends FileManager {
             File file = fileChooser.getSelectedFile();
             frame.setTitle(file.getName());
             try {
-                textArea.setText(fm.readFile(String.valueOf(file)));
-                fileChooser.setSelectedFile(null);
+                if (file.getName().endsWith(".pdf")) {
+                    textArea.setText(readPDF(file));
+                }
+                else {
+                    textArea.setText(fm.readFile(String.valueOf(file)));
+                    fileChooser.setSelectedFile(null);
+                }
             } catch(IOException e) {
                 textArea.setText("Error reading file " + e.getMessage());
             }
         }
 
         save.addActionListener(_ -> {
-            String content = textArea.getText();
+            String content = textArea.getText().replaceAll("[\\u0000-\\u001F]", ""); // Remove control characters
             File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
-            try {
-                fm.writeFile(String.valueOf(file), content);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (file.getName().endsWith(".pdf")) {
+                try (PDDocument document = new PDDocument()) {
+                    PDPage page = new PDPage();
+                    document.addPage(page);
+                    PDPageContentStream contentStream = new PDPageContentStream(document, page);
+                    contentStream.beginText();
+                    contentStream.newLineAtOffset(50, 750);
+                    contentStream.setFont(PDType1Font.TIMES_ROMAN, 12);
+                    contentStream.showText(content);
+                    contentStream.endText();
+                    contentStream.close();
+                    document.save(file);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                try {
+                    fm.writeFile(String.valueOf(file), content);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
+
 
         frame.revalidate();
         frame.repaint();
@@ -227,7 +275,7 @@ public class guiFile extends FileManager {
 
         yesButton.addActionListener(_-> {
             try {
-                fm.deleteFile("fileLocations/"+filename+".txt");
+                fm.deleteFile("fileLocations/"+filename);
 
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
