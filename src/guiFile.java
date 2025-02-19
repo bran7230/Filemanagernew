@@ -1,7 +1,11 @@
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.encoding.WinAnsiEncoding;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -12,9 +16,9 @@ import javax.swing.text.Document;
 public class guiFile extends FileManager {
 
     // Color constants
-    private static final Color BACKGROUND_COLOR = new Color(0x2D2D2D);
-    private static final Color SECONDARY_BACKGROUND = new Color(0x3D3D3D);
-    private static final Color TEXT_COLOR = Color.WHITE;
+    private static final Color BACKGROUND_COLOR = new Color(0x2D2D2D); //Background Color
+    private static final Color SECONDARY_BACKGROUND = new Color(0x3D3D3D); //Secondary background color
+    private static final Color TEXT_COLOR = Color.WHITE; //Text color
     private static final Color ACCENT_COLOR = new Color(0x4A90E2);
 
     static FileManager fm = new FileManager();
@@ -197,14 +201,16 @@ public class guiFile extends FileManager {
         save.addActionListener(_ -> {
             String content = textArea.getText().replaceAll("[\\u0000-\\u001F]", ""); // Remove control characters
             File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+
             if (file.getName().endsWith(".pdf")) {
                 try (PDDocument document = new PDDocument()) {
                     PDPage page = new PDPage();
                     document.addPage(page);
                     PDPageContentStream contentStream = new PDPageContentStream(document, page);
                     contentStream.beginText();
-                    contentStream.newLineAtOffset(50, 750);
-                    contentStream.setFont(PDType1Font.TIMES_ROMAN, 12);
+                    contentStream.newLineAtOffset(50, 100);
+                    PDType0Font font = PDType0Font.load(document, new File("C:\\Users\\brand\\IdeaProjects\\Filemanager\\fonts\\dejavu-sans\\ttf\\DejaVuSans.ttf"));
+                    contentStream.setFont(font, 12); // Specify the font size
                     contentStream.showText(content);
                     contentStream.endText();
                     contentStream.close();
@@ -276,11 +282,10 @@ public class guiFile extends FileManager {
         yesButton.addActionListener(_-> {
             try {
                 fm.deleteFile("fileLocations/"+filename);
-
+                JOptionPane.showMessageDialog(choiceframe, "File Deleted Successfully");
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-
             choiceframe.dispose();
         });
 
@@ -335,6 +340,5 @@ public class guiFile extends FileManager {
         textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
     }
-
 
 }
