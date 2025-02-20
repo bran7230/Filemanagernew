@@ -1,39 +1,71 @@
+import com.formdev.flatlaf.FlatLightLaf;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDTrueTypeFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.encoding.WinAnsiEncoding;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.nio.file.*;
-import javax.swing.text.Document;
 
 public class guiFile extends FileManager {
 
     // Color constants
-    private static final Color BACKGROUND_COLOR = new Color(0x2D2D2D); //Background Color
-    private static final Color SECONDARY_BACKGROUND = new Color(0x3D3D3D); //Secondary background color
-    private static final Color TEXT_COLOR = Color.WHITE; //Text color
+    private static final Color BACKGROUND_COLOR = new Color(0x2D2D2D); // Background Color
+    private static final Color SECONDARY_BACKGROUND = new Color(0x3D3D3D); // Secondary background color
+    private static final Color TEXT_COLOR = Color.WHITE; // Text color
     private static final Color ACCENT_COLOR = new Color(0x4A90E2);
 
     static FileManager fm = new FileManager();
     private static JTextArea textArea = new JTextArea(); // Persistent text area
 
-
-
     public static void main(String[] args) {
+
+        // Setup FlatLightLaf
+        FlatLightLaf.setup();
+        UIManager.put("MenuBar.background", new ColorUIResource(BACKGROUND_COLOR));
+        UIManager.put("MenuBar.foreground", new ColorUIResource(TEXT_COLOR));
+        UIManager.put("PopupMenu.background", new ColorUIResource(SECONDARY_BACKGROUND));
+        UIManager.put("PopupMenu.foreground", new ColorUIResource(TEXT_COLOR));
+
+
+        JFrame.setDefaultLookAndFeelDecorated(true);
+
+        JFrame frameMain = new JFrame();
+        frameMain.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        ImageIcon image = new ImageIcon("C:\\Users\\brand\\IdeaProjects\\Filemanager\\images\\galaxy.jpg");
+        JLabel imageLabel = new JLabel(image);
+        imageLabel.setLayout(new BorderLayout());
         JFrame frame = createFrame();
         JMenuItem save = new JMenuItem("Save");
         styleMenuItem(save);
         JMenuBar menubar = createMenuBar(frame, save);
         frame.setJMenuBar(menubar);
         frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        frameMain.setLocationRelativeTo(null);
+        frameMain.add(imageLabel);
+        frameMain.setIconImage(image.getImage());
+        frameMain.setTitle("File Manager");
+
+        frameMain.getRootPane().putClientProperty("JRootPane.titleBarBackground", Color.black);
+        frameMain.getRootPane().putClientProperty("JRootPane.titleBarForeground", Color.white);
+        frame.getRootPane().putClientProperty("JRootPane.titleBarBackground", SECONDARY_BACKGROUND);
+        frame.getRootPane().putClientProperty("JRootPane.titleBarForeground", TEXT_COLOR);
+        frameMain.setVisible(true);
+
+        imageLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frameMain.dispose();
+                frame.setVisible(true);
+            }
+        });
     }
 
     private static JFrame createFrame(){
@@ -59,10 +91,8 @@ public class guiFile extends FileManager {
     }
 
     private static JMenuBar createMenuBar(JFrame frame, JMenuItem save) {
-
         JMenuBar menuBar = new JMenuBar();
         styleMenuBar(menuBar);
-
         JMenu fileMenu = new JMenu("File");
         styleMenu(fileMenu);
 
@@ -80,7 +110,6 @@ public class guiFile extends FileManager {
         styleMenuItem(deleteMenuItem);
         styleMenuItem(save);
 
-
         fileMenu.add(editMenuItem);
         fileMenu.add(openMenuItem);
         fileMenu.add(exitMenuItem);
@@ -90,8 +119,7 @@ public class guiFile extends FileManager {
 
         menuBar.add(fileMenu);
 
-
-        openMenuItem.addActionListener(_->{
+        openMenuItem.addActionListener(_ -> {
             int verify = JOptionPane.showConfirmDialog(frame, "Are you sure you want to open file?\n Deletes current on screen text", "Open", JOptionPane.YES_NO_OPTION);
             if (verify == JOptionPane.YES_OPTION) {
                 try {
@@ -102,70 +130,67 @@ public class guiFile extends FileManager {
             }
         });
 
-        exitMenuItem.addActionListener(_-> System.exit(0));
-        editMenuItem.addActionListener(_-> {
-
+        exitMenuItem.addActionListener(_ -> System.exit(0));
+        editMenuItem.addActionListener(_ -> {
+            // Edit action
         });
-        createMenuItem.addActionListener(_-> createFileframe());
-        deleteMenuItem.addActionListener(_-> deleteFileframe());
+        createMenuItem.addActionListener(_ -> createFileframe());
+        deleteMenuItem.addActionListener(_ -> deleteFileframe());
 
         return menuBar;
     }
 
     public static JFrame createFileframe(){
+        JFrame createframe = new JFrame("Enter name for a File you want to create");
+        createframe.setSize(600, 400);
+        createframe.setLocationRelativeTo(null);
 
-            JFrame createframe = new JFrame("Enter name for a File you want to create");
-            createframe.setSize(600, 400);
-            createframe.setLocationRelativeTo(null);
+        Container container = createframe.getContentPane();
+        container.setLayout(new FlowLayout());
+        container.setBackground(BACKGROUND_COLOR);
 
-            Container container = createframe.getContentPane();
-            container.setLayout(new FlowLayout());
-            container.setBackground(BACKGROUND_COLOR);
+        JTextField textField = new JTextField(20);
+        styleTextField(textField);
 
-            JTextField textField = new JTextField(20);
-            styleTextField(textField);
+        // Add a JComboBox for file type selection
+        String[] fileTypes = {"PDF", "TXT"};
+        JComboBox<String> fileTypeComboBox = new JComboBox<>(fileTypes);
 
-            // Add a JComboBox for file type selection
-            String[] fileTypes = {"PDF", "TXT"};
-            JComboBox<String> fileTypeComboBox = new JComboBox<>(fileTypes);
+        JButton submitButton = new JButton("Submit");
+        styleButton(submitButton);
 
-            JButton submitButton = new JButton("Submit");
-            styleButton(submitButton);
-
-            submitButton.addActionListener(_ -> {
-                String name = textField.getText();
-                String fileType = (String) fileTypeComboBox.getSelectedItem();
-                String filePath = "fileLocations/" + name + "." + fileType.toLowerCase();
-                try {
-                    if (Files.exists(Path.of(filePath))) {
-                        JOptionPane.showMessageDialog(null, "File already exists!", "Error", JOptionPane.ERROR_MESSAGE);
-                        createframe.dispose();
-                    }
-                    else {
-
-                        if ("PDF".equals(fileType)) {
-                            createPDF(filePath);
-                        } else if ("TXT".equals(fileType)) {
-                            File file = new File(filePath);
-                            if (file.createNewFile()) {
-                                System.out.println("File created");
-                            } else {
-                                System.out.println("File already exists");
-                            }
+        submitButton.addActionListener(_ -> {
+            String name = textField.getText();
+            String fileType = (String) fileTypeComboBox.getSelectedItem();
+            String filePath = "fileLocations/" + name + "." + fileType.toLowerCase();
+            try {
+                if (Files.exists(Path.of(filePath))) {
+                    JOptionPane.showMessageDialog(null, "File already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+                    createframe.dispose();
+                } else {
+                    if ("PDF".equals(fileType)) {
+                        createPDF(filePath);
+                    } else if ("TXT".equals(fileType)) {
+                        File file = new File(filePath);
+                        if (file.createNewFile()) {
+                            System.out.println("File created");
+                        } else {
+                            System.out.println("File already exists");
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-                createframe.dispose();
-            });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            createframe.dispose();
+        });
 
-            container.add(textField);
-            container.add(fileTypeComboBox);
-            container.add(submitButton);
-            createframe.setVisible(true);
-            return createframe;
-        }
+        container.add(textField);
+        container.add(fileTypeComboBox);
+        container.add(submitButton);
+        createframe.setVisible(true);
+        return createframe;
+    }
 
     public static JFrame openFileFrame(JFrame frame, JMenuItem save) throws IOException {
         frame.getContentPane().removeAll();
@@ -188,19 +213,21 @@ public class guiFile extends FileManager {
             try {
                 if (file.getName().endsWith(".pdf")) {
                     textArea.setText(readPDF(file));
-                }
-                else {
+                } else {
                     textArea.setText(fm.readFile(String.valueOf(file)));
-                    fileChooser.setSelectedFile(null);
                 }
             } catch(IOException e) {
                 textArea.setText("Error reading file " + e.getMessage());
             }
         }
+        File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+
+        for (ActionListener listener : save.getActionListeners()) {
+            save.removeActionListener(listener);
+        }
 
         save.addActionListener(_ -> {
             String content = textArea.getText().replaceAll("[\\u0000-\\u001F]", ""); // Remove control characters
-            File file = new File(fileChooser.getSelectedFile().getAbsolutePath());
 
             if (file.getName().endsWith(".pdf")) {
                 try (PDDocument document = new PDDocument()) {
@@ -208,7 +235,7 @@ public class guiFile extends FileManager {
                     document.addPage(page);
                     PDPageContentStream contentStream = new PDPageContentStream(document, page);
                     contentStream.beginText();
-                    contentStream.newLineAtOffset(50, 100);
+                    contentStream.newLineAtOffset(100, 750);
                     PDType0Font font = PDType0Font.load(document, new File("C:\\Users\\brand\\IdeaProjects\\Filemanager\\fonts\\dejavu-sans\\ttf\\DejaVuSans.ttf"));
                     contentStream.setFont(font, 12); // Specify the font size
                     contentStream.showText(content);
@@ -228,11 +255,11 @@ public class guiFile extends FileManager {
         });
 
 
+
         frame.revalidate();
         frame.repaint();
         return frame;
     }
-
 
     public static JFrame deleteFileframe(){
         JFrame deleteFileframe = new JFrame("Delete a file");
@@ -278,10 +305,12 @@ public class guiFile extends FileManager {
         JButton noButton = new JButton("NO");
         styleButton(yesButton);
         styleButton(noButton);
+        yesButton.setFocusPainted(false);
+        noButton.setFocusPainted(false);
 
-        yesButton.addActionListener(_-> {
+        yesButton.addActionListener(_ -> {
             try {
-                fm.deleteFile("fileLocations/"+filename);
+                fm.deleteFile("fileLocations/" + filename);
                 JOptionPane.showMessageDialog(choiceframe, "File Deleted Successfully");
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
@@ -289,7 +318,7 @@ public class guiFile extends FileManager {
             choiceframe.dispose();
         });
 
-        noButton.addActionListener(_-> choiceframe.dispose());
+        noButton.addActionListener(_ -> choiceframe.dispose());
 
         choiceframe.add(field);
         choiceframe.add(yesButton);
@@ -301,7 +330,7 @@ public class guiFile extends FileManager {
     private static void styleMenuBar(JMenuBar menuBar) {
         menuBar.setBackground(SECONDARY_BACKGROUND);
         menuBar.setForeground(TEXT_COLOR);
-        menuBar.setBorder(BorderFactory.createLineBorder(BACKGROUND_COLOR));
+        menuBar.setBorder(BorderFactory.createEmptyBorder());
     }
 
     private static void styleMenu(JMenu menu) {
@@ -340,5 +369,4 @@ public class guiFile extends FileManager {
         textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
     }
-
 }
