@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.io.*;
 public class FileManager{
 
-    public void createFile(String fileName) throws IOException {
+    public static void createFile(String fileName) throws IOException {
         File file = new File(fileName);
         if (file.createNewFile()) {
             System.out.println("File created: " + file.getName());
