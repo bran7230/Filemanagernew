@@ -10,5 +10,6 @@
     <orderEntry type="library" name="ch.codeblock.qrinvoice.pdfbox" level="project" />
     <orderEntry type="library" name="formdev.flatlaf" level="project" />
     <orderEntry type="library" name="json" level="project" />
+    <orderEntry type="library" name="io.warp10.plugin.py4j" level="project" />
   </component>
 </module>

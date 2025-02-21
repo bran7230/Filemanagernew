@@ -123,6 +123,7 @@ public class guiFile extends FileManager {
     private static JMenuBar createMenuBar(JFrame frame, JMenuItem save) {
         JMenuBar menuBar = new JMenuBar();
         styleMenuBar(menuBar);
+        menuBar.setLayout(new FlowLayout());
         JMenu fileMenu = new JMenu("File");
         styleMenu(fileMenu);
 
@@ -133,6 +134,7 @@ public class guiFile extends FileManager {
         JMenuItem createMenuItem = new JMenuItem("Create");
         JMenuItem deleteMenuItem = new JMenuItem("Delete");
 
+
         // Apply styling to each menu item
         styleMenuItem(openMenuItem);
         styleMenuItem(exitMenuItem);
@@ -140,6 +142,7 @@ public class guiFile extends FileManager {
         styleMenuItem(createMenuItem);
         styleMenuItem(deleteMenuItem);
         styleMenuItem(save);
+
 
         // Add menu items to the "File" menu in the desired order
         fileMenu.add(editMenuItem);
@@ -149,8 +152,13 @@ public class guiFile extends FileManager {
         fileMenu.add(deleteMenuItem);
         fileMenu.add(save);
 
+
+
+
+
         // Add the "File" menu to the menu bar
         menuBar.add(fileMenu);
+
 
         // Add action listener for the "Open" menu item
         openMenuItem.addActionListener(_ -> {
