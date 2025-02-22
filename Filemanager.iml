@@ -11,5 +11,6 @@
     <orderEntry type="library" name="formdev.flatlaf" level="project" />
     <orderEntry type="library" name="json" level="project" />
     <orderEntry type="library" name="io.warp10.plugin.py4j" level="project" />
+    <orderEntry type="library" name="mpatric.mp3agic" level="project" />
   </component>
 </module>

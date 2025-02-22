@@ -49,7 +49,7 @@ public class FileManager{
             PDPage page = new PDPage();
             document.addPage(page);
             document.save(fileName);
-            System.out.println("PDF created successfully!");
+            JOptionPane.showMessageDialog(null, "PDF created");
         } catch (IOException e) {
             e.printStackTrace();
         }

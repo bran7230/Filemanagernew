@@ -6,16 +6,15 @@ import java.util.Scanner;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class apiFile {
+public class apiFile extends guiFile {
     private static final String API_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter a word: ");
-        String word = scanner.nextLine();
+
 
         try {
-            String response = callApi(word);
+            String response = callApi("");
             String definition = extractDefinition(response);
             System.out.println("Definition: " + definition);
         } catch (Exception e) {

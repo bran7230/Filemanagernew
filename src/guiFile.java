@@ -8,6 +8,7 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 // Import standard AWT classes for GUI components and events
 import java.awt.*;
 import java.awt.dnd.DropTarget;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -35,7 +36,8 @@ public class guiFile extends FileManager {
     // Create a persistent JTextArea for displaying file contents
     private static JTextArea textArea = new JTextArea();
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws InterruptedException {
 
         // Setup the FlatLightLaf look and feel for the UI
         FlatLightLaf.setup();
@@ -50,15 +52,18 @@ public class guiFile extends FileManager {
 
         // Create the main frame (used as a backdrop with an image)
         JFrame frameMain = new JFrame();
-        frameMain.setSize(1920, 1080); // Set base size of the main frame
+        frameMain.setSize(1440, 1000); // Set base size of the main frame
         frameMain.setMinimumSize(new Dimension(600, 400)); // Set minimum allowed size
+        frameMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameMain.setResizable(false);
 
         // Load an image and set it as a background image
-        ImageIcon image = new ImageIcon("C:\\Users\\brand\\IdeaProjects\\Filemanager\\images\\galaxy.jpg");
+        //image credit: openartAi
+        ImageIcon image = new ImageIcon("images/openart-video_ba79f20e_1740178718915.gif");
         JLabel imageLabel = new JLabel(image);
         imageLabel.setLayout(new BorderLayout());
 
-        // Create the primary application frame where file operations will occur
+            // Create the primary application frame where file operations will occur
         JFrame frame = createFrame();
 
         // Create a "Save" menu item and apply styling to it
@@ -126,34 +131,30 @@ public class guiFile extends FileManager {
         menuBar.setLayout(new FlowLayout());
         JMenu fileMenu = new JMenu("File");
         styleMenu(fileMenu);
+        JMenu wordMenu = new JMenu("Word");
 
         // Create menu items for file operations
         JMenuItem openMenuItem = new JMenuItem("Open");
         JMenuItem exitMenuItem = new JMenuItem("Exit");
-        JMenuItem editMenuItem = new JMenuItem("Edit");
         JMenuItem createMenuItem = new JMenuItem("Create");
         JMenuItem deleteMenuItem = new JMenuItem("Delete");
+        JMenuItem copyMenuItem = new JMenuItem("Copy");
 
 
         // Apply styling to each menu item
         styleMenuItem(openMenuItem);
         styleMenuItem(exitMenuItem);
-        styleMenuItem(editMenuItem);
         styleMenuItem(createMenuItem);
         styleMenuItem(deleteMenuItem);
         styleMenuItem(save);
 
 
         // Add menu items to the "File" menu in the desired order
-        fileMenu.add(editMenuItem);
         fileMenu.add(openMenuItem);
         fileMenu.add(exitMenuItem);
         fileMenu.add(createMenuItem);
         fileMenu.add(deleteMenuItem);
         fileMenu.add(save);
-
-
-
 
 
         // Add the "File" menu to the menu bar
@@ -175,10 +176,6 @@ public class guiFile extends FileManager {
 
         // Add action listener to exit the application when "Exit" is clicked
         exitMenuItem.addActionListener(_ -> System.exit(0));
-        // Placeholder for "Edit" action
-        editMenuItem.addActionListener(_ -> {
-            // Edit action
-        });
         // Add action listener for creating a file
         createMenuItem.addActionListener(_ -> createFileframe());
         // Add action listener for deleting a file
@@ -273,9 +270,12 @@ public class guiFile extends FileManager {
                 // Read file content differently if it is a PDF or a TXT file
                 if (file.getName().endsWith(".pdf")) {
                     textArea.setText(readPDF(file));
-                } else {
+                }
+
+                else if (file.getName().endsWith(".txt")) {
                     textArea.setText(fm.readFile(String.valueOf(file)));
                 }
+
             } catch(IOException e) {
                 textArea.setText("Error reading file " + e.getMessage());
             }
@@ -307,16 +307,21 @@ public class guiFile extends FileManager {
                     contentStream.close();
                     document.save(file);
                 } catch (IOException e) {
+
                     throw new RuntimeException(e);
+
                 }
-            } else {
-                // For non-PDF files, use FileManager to write the file
+
+            }
+            else if (file.getName().endsWith(".txt")) {
+                // For .txt files
                 try {
                     fm.writeFile(String.valueOf(file), content);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
+
         });
 
         // Refresh the frame to show updated content
